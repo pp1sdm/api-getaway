@@ -1,8 +1,12 @@
-[package]
-name = "rust-api-getaway"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+members = [
+    "creates/*"
+]
+resolver = "3"
 
-[dependencies]
-tokio = {version = "1.53.2", features = ["full"]}
+[workspace.dependencies]
+tokio = { version = "1.53.2", features = ["full"] }
 axum = "0.8"
+reqwest = "0.13"
+serde = { version = "1", features = ["derive"] }
+toml = "0.9"

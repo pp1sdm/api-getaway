@@ -1,0 +1,11 @@
+[package]
+name = "getaway"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = {workspace = true}
+reqwest = {workspace = true}
+axum = {workspace = true}
+serde = { workspace = true}
+toml = {workspace = true}
