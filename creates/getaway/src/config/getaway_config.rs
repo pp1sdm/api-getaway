@@ -1,36 +1,31 @@
 use serde::Deserialize;
+use crate::router::Method;
 
 #[derive(Debug, Deserialize)]
-pub struct Config {
-    pub server: Server,
-    pub upstream: Upstream,
-    pub routes: Vec<Route>,
-    pub fallback: Fallback,
+pub struct GatewayConfig {
+    pub server: ServerConfig,
+    pub upstream: UpstreamConfig,
+    pub routes: Vec<RouteConfig>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Server {
+pub struct ServerConfig {
     pub host: String,
     pub port: u16,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Upstream {
+pub struct UpstreamConfig {
     pub address: String,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Route {
+pub struct RouteConfig {
     pub path: String,
-    pub method: String,
+    pub method: Method,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct Fallback {
-    pub enabled: bool,
-}
-
-impl Config {
+impl GatewayConfig {
     pub fn load() -> Self {
         let content = std::fs::read_to_string("config/getaway_config.toml")
             .expect("读取配置文件失败");

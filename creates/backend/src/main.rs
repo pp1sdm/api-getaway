@@ -9,7 +9,7 @@ async  fn main() {
     let app: Router = Router::new()
         .route("/", get(|| async { "这里是根目录路径" }))
         .route("/api/user", get(|| async { "这里是用户得api" }))
-        .route("health", get(|| async { "这里是健康路由" }))
+        .route("/health", get(|| async { "这里是健康路由" }))
         .fallback("这里是保底路由");
 
     // 绑定Tokio的监听

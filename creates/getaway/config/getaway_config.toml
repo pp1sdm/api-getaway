@@ -7,13 +7,14 @@ address = "http://127.0.0.1:3001"
 
 [[routes]]
 path = "/"
+method = "GET"
 
 [[routes]]
 path = "/api/user"
+method = "GET"
 
 [[routes]]
 path = "/health"
+method = "GET"
 
-[fallback]
-enabled = true
 

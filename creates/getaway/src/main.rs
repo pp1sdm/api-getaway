@@ -1,44 +1,34 @@
-mod router;
-mod config;
-
-use axum::{
-    routing::get,
-    Router,
-    body::Body,
-    http::Request
-};
-use router::*;
-use config::getaway_config::*;
+use getaway::{build_app, AppState, GatewayConfig, RouteTable};
+use reqwest::Client;
+use tokio::net::TcpListener;
+use axum::serve;
 
 #[tokio::main]
 async  fn main() {
     // 拿到getaway配置
-    let getaway_config = Config::load();
+    let getaway_config = GatewayConfig::load();
 
     // 通过配置拿到生成路由表
-    let router_table = RouteTable::from_config(&getaway_config);
+    let router_table = RouteTable::add_route_table(&getaway_config);
 
-    async fn proxy(request: Request<Body>) {
-        // 拿到路径
-        let path = request.uri().path();
+    // 创建客户端
+    let client = Client::builder()
+        .tcp_nodelay(true)
+        .pool_max_idle_per_host(32)
+        .build()
+        .expect("网络客户端构建失败");
 
-        // 匹配路由
+    // 组装
+    let state = AppState::new(client, router_table, getaway_config);
+    let addr = format!("{}:{}", state.config.server.host, state.config.server.port);
+    let app = build_app(state);
 
-    }
+    // 监听
+    let listener = TcpListener::bind(&addr).await.unwrap();
 
-    // 捕获前端请求
-    let app = Router::new().fallback(proxy);
+    // 网关正在监听
+    println!("网关监听{addr}");
 
-    // 绑定地址
-    let addr = format!("{}:{}", getaway_config.server.host, getaway_config.server.port);
-
-    // 绑定Tokio的监听
-    let listener = tokio::net::TcpListener::bind(addr)
-        .await
-        .unwrap();
-
-    // 服务器服务
-    axum::serve(listener, app)
-        .await
-        .unwrap();
+    // 启动服务
+    serve(listener, app.into_make_service_with_connect_info::<std::net::SocketAddr>()).await.unwrap()
 }
